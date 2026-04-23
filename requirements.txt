@@ -11,3 +11,5 @@ psycopg2-binary==2.9.9
 pytest==8.2.2
 pytest-cov==6.2.1
 transaction==4.0
+
+alembic==1.13.1
