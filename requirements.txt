@@ -1,0 +1,13 @@
+fastapi==0.111.0
+uvicorn==0.34.0
+sqlalchemy==2.0.31
+pydantic==2.7.4
+pydantic-settings==2.3.3
+starlette==0.37.2
+SQLAlchemy-Utils==0.41.2
+psycopg2-binary==2.9.9
+
+# test package
+pytest==8.2.2
+pytest-cov==6.2.1
+transaction==4.0

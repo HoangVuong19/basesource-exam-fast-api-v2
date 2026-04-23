@@ -1,0 +1,8 @@
+{
+  "SYSTEM_EXCEPTION": {
+    "exam500": "Internal server error!"
+  },
+  "APP_EXCEPTION": {
+    "exam404": "not found!"
+  }
+}
