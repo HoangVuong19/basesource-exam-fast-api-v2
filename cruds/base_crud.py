@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import select
 
 from models.base_model import ModelType
-from exceptions.app_exception import ResourceNotFound
+from exceptions.app_exception import AppException
 
 T = TypeVar("T", bound=DeclarativeMeta)
 
@@ -39,7 +39,7 @@ class BaseCrud(Generic[ModelType]):
         try:
             model = self.model(**attributes)
             self.session.add(model)
-            self.session.flush()
+            self.session.commit()
             return model
         except Exception:
             self.session.rollback()
@@ -56,14 +56,15 @@ class BaseCrud(Generic[ModelType]):
             model_instance = self.get_by_id(entity_id, join_, id_key)
 
             if not model_instance:
-                raise ResourceNotFound()
+                raise AppException("exam404")
 
             for attr, value in data.items():
                 setattr(model_instance, attr, value)
 
+            self.session.commit()
             return model_instance
         except Exception as e:
-            if not isinstance(e, ResourceNotFound):
+            if not isinstance(e, AppException("exam404")):
                 self.session.rollback()
             raise
 
@@ -217,7 +218,7 @@ class BaseCrud(Generic[ModelType]):
         try:
             entity = self.get_by_id(entity_id, id_key=id_key, del_flag=False)
             if not entity:
-                raise ResourceNotFound()
+                raise AppException("exam404")
 
             if logical:
                 # Logic delete

@@ -6,6 +6,7 @@ pydantic-settings==2.3.3
 starlette==0.37.2
 SQLAlchemy-Utils==0.41.2
 psycopg2-binary==2.9.9
+pyhumps==3.8.0
 
 # test package
 pytest==8.2.2
@@ -13,3 +14,4 @@ pytest-cov==6.2.1
 transaction==4.0
 
 alembic==1.13.1
+black==25.9.0
