@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.error("Validation error occurred", exc_info=True)
-    err = exc.errors()[0]
-    message = f"{err['loc'][-1]}: {err['msg']}"
+    message = " | ".join(
+        [f"{'.'.join(map(str, err['loc']))}: {err['msg']}" for err in exc.errors()]
+    )
     return response_fail(ValidationException("exam422", message))
