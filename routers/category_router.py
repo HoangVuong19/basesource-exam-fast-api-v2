@@ -20,3 +20,15 @@ def get_categories(db: Session = Depends(get_db)):
 def create_category(request: CategoryReq, db: Session = Depends(get_db)):
     crud = category_crud.CategoryCrud(db)
     return response_success(crud.create_category(request))
+
+
+@router.put("/categories")
+def update_category(request: CategoryReq, db: Session = Depends(get_db)):
+    crud = category_crud.CategoryCrud(db)
+    return response_success(crud.update_category(request))
+
+
+@router.delete("/categories/{category_id}")
+def delete_category(category_id: int, db: Session = Depends(get_db)):
+    crud = category_crud.CategoryCrud(db)
+    return response_success(crud.delete_category(category_id))

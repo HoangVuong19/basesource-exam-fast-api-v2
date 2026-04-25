@@ -16,3 +16,12 @@ class CategoryCrud(BaseCrud[Category]):
 
     def create_category(self, req: CategoryReq) -> CategoryRes:
         return CategoryRes.model_validate(self.create(req.model_dump()))
+
+    def update_category(self, req: CategoryReq) -> CategoryRes:
+        return CategoryRes.model_validate(
+            self.update(req.id, req.model_dump(exclude={"id"}))
+        )
+
+    def delete_category(self, category_id: int) -> str:
+        self.delete_by_id(category_id, logical=False)
+        return "Delete category successfully"
