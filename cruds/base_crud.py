@@ -2,12 +2,15 @@ from functools import reduce
 from typing import Any, Generic, Type, Union
 
 from sqlalchemy import Select, func
+from configs.logging import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import select
 
 from exceptions.app_exception import AppException
 from typing import TypeVar
 from models.base_model import Base
+
+logger = logging.getLogger(__name__)
 
 
 ModelType = TypeVar("ModelType", bound=Base)
@@ -42,7 +45,8 @@ class BaseCrud(Generic[ModelType]):
             self.session.add(model)
             self.session.commit()
             return model
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             self.session.rollback()
             raise
 
@@ -64,9 +68,11 @@ class BaseCrud(Generic[ModelType]):
 
             self.session.commit()
             return model_instance
+        except AppException:
+            raise
         except Exception as e:
-            if not isinstance(e, AppException):
-                self.session.rollback()
+            logger.exception(e)
+            self.session.rollback()
             raise
 
     def get_all(
@@ -202,7 +208,8 @@ class BaseCrud(Generic[ModelType]):
         try:
             self.session.delete(entity)
             self.session.commit()
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             self.session.rollback()
             raise
 
@@ -218,23 +225,27 @@ class BaseCrud(Generic[ModelType]):
         :return: None
         """
         try:
-            entity = self.get_by_id(entity_id, id_key=id_key, del_flag=False)
+            entity = self.get_by_id(entity_id, id_key=id_key)
             if not entity:
                 raise AppException("exam404")
 
             if logical:
                 # Logic delete
                 if not hasattr(entity, "del_flag"):
-                    raise AttributeError(
-                        f"Model {self.model.__name__} does not have 'del_flag' field"
+                    logger.error(
+                        "Model %s does not have del_flag attribute for logical delete",
+                        self.model.__name__,
                     )
+                    raise AppException("exam404")
                 setattr(entity, "del_flag", True)
             else:
                 # Physical delete
                 self.session.delete(entity)
             self.session.commit()
-
-        except Exception:
+        except AppException:
+            raise
+        except Exception as e:
+            logger.exception(e)
             self.session.rollback()
             raise
 
@@ -370,7 +381,8 @@ class BaseCrud(Generic[ModelType]):
             return query
 
         if not isinstance(join_, set):
-            raise TypeError("join_ must be a set")
+            logger.error("join_ must be a set, got %s", type(join_).__name__)
+            raise
 
         return reduce(self._add_join_to_query, join_, query)
 
