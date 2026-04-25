@@ -1,6 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 
+from fastapi.exceptions import ValidationException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -43,7 +44,7 @@ def response_success(data: any):
     )
 
 
-def response_fail(exc: AppException):
+def response_fail(exc: AppException | ValidationException):
     errors = [{"code": exc.error_code, "message": exc.message}]
     status_code = exc.http_code
 

@@ -232,6 +232,7 @@ class BaseCrud(Generic[ModelType]):
             else:
                 # Physical delete
                 self.session.delete(entity)
+            self.session.commit()
 
         except Exception:
             self.session.rollback()

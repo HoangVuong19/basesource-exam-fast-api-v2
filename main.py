@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from configs.env import get_settings
+from configs.handler import validation_exception_handler
 from configs.logging import setup_logging
 from routers import all_router
 from middlewares.request_middleware import RequestMiddleware
@@ -14,6 +16,8 @@ app = FastAPI(title=settings.app_name, version=settings.api_version)
 # includes all routers of the app
 for router in all_router:
     app.include_router(router, prefix=settings.api_prefix, tags=["REST"])
+
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # add middlewares
 __MIDDLEWARES__ = [RequestMiddleware]
