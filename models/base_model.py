@@ -1,9 +1,9 @@
 from sqlalchemy import Column, DateTime, String, func
-from sqlalchemy.orm import declarative_base
-from typing import TypeVar
+from sqlalchemy.orm import DeclarativeBase
 
-Base = declarative_base()
-ModelType = TypeVar("ModelType", bound=Base)  # type: ignore
+
+class Base(DeclarativeBase):
+    pass
 
 
 class BaseModel(Base):

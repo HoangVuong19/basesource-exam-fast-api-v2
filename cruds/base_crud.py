@@ -1,15 +1,16 @@
 from functools import reduce
-from typing import Any, Generic, Type, TypeVar, Union
+from typing import Any, Generic, Type, Union
 
 from sqlalchemy import Select, func
-from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import select
 
-from models.base_model import ModelType
 from exceptions.app_exception import AppException
+from typing import TypeVar
+from models.base_model import Base
 
-T = TypeVar("T", bound=DeclarativeMeta)
+
+ModelType = TypeVar("ModelType", bound=Base)
 
 
 class BaseCrud(Generic[ModelType]):
@@ -64,7 +65,7 @@ class BaseCrud(Generic[ModelType]):
             self.session.commit()
             return model_instance
         except Exception as e:
-            if not isinstance(e, AppException("exam404")):
+            if not isinstance(e, AppException):
                 self.session.rollback()
             raise
 
@@ -117,7 +118,7 @@ class BaseCrud(Generic[ModelType]):
         :return: The model instance.
         """
         query = self._query(join_)
-        query = self._get_by_muti_fields(query, conditions)
+        query = self._get_by_multi_fields(query, conditions)
 
         if join_ is not None:
             return self.all_unique(query)
@@ -136,7 +137,7 @@ class BaseCrud(Generic[ModelType]):
         :return: A list of model instances.
         """
         query = self._query(join_)
-        query = self._get_by_muti_fields(query, conditions)
+        query = self._get_by_multi_fields(query, conditions)
 
         return self._all(query)
 
@@ -200,6 +201,7 @@ class BaseCrud(Generic[ModelType]):
         """
         try:
             self.session.delete(entity)
+            self.session.commit()
         except Exception:
             self.session.rollback()
             raise
@@ -345,7 +347,7 @@ class BaseCrud(Generic[ModelType]):
         """
         return query.where(getattr(self.model, field) == value)
 
-    def _get_by_muti_fields(self, query: Select, conditions: list) -> Select:
+    def _get_by_multi_fields(self, query: Select, conditions: list) -> Select:
         """
         Returns the query filtered by the given column.
 

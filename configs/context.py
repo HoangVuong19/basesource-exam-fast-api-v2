@@ -1,7 +1,13 @@
+# context.py
 import uuid
 from contextvars import ContextVar
 
-# context variable, used in multi-thread request
-request_id: ContextVar[uuid.UUID] = ContextVar(
-    "request_id", default=uuid.UUID("00000000-0000-0000-0000-000000000000")
-)
+request_id_ctx: ContextVar[uuid.UUID | None] = ContextVar("request_id", default=None)
+
+
+def set_request_id(request_id: uuid.UUID):
+    request_id_ctx.set(request_id)
+
+
+def get_request_id() -> uuid.UUID | None:
+    return request_id_ctx.get()

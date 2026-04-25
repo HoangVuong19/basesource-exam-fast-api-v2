@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from configs.env import get_settings
+from configs.logging import setup_logging
 from routers import all_router
 from middlewares.request_middleware import RequestMiddleware
 
+setup_logging()
 settings = get_settings()
 
 app = FastAPI(title=settings.app_name, version=settings.api_version)
